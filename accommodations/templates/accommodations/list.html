@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Accommodations - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <h2 class="text-2xl md:text-3xl font-semibold mb-4">Browse</h2>
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Room Type -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">All Types</label>
+                <select name="room_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    <option value="single" {% if selected_room_type == 'single' %}selected{% endif %}>Single Room</option>
+                    <option value="double" {% if selected_room_type == 'double' %}selected{% endif %}>Double Room</option>
+                    <option value="triple" {% if selected_room_type == 'triple' %}selected{% endif %}>Triple Room</option>
+                </select>
+            </div>
+
+            <!-- Location -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">All Locations</label>
+                <select name="location" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Locations</option>
+                    {% for location in locations %}
+                    <option value="{{ location.id }}" {% if selected_location == location.id|stringformat:"s" %}selected{% endif %}>
+                        {{ location.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Price Range -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">All Prices</label>
+                <select name="price_range" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Prices</option>
+                    <option value="0-300" {% if selected_price_range == '0-300' %}selected{% endif %}>R0 - R300</option>
+                    <option value="300-500" {% if selected_price_range == '300-500' %}selected{% endif %}>R300 - R500</option>
+                    <option value="500-700" {% if selected_price_range == '500-700' %}selected{% endif %}>R500 - R700</option>
+                    <option value="700+" {% if selected_price_range == '700+' %}selected{% endif %}>R700+</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-4 flex justify-center space-x-4">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                    Apply Filters
+                </button>
+                <a href="{% url 'accommodation_list' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400">
+                    Clear
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results -->
+    <div class="mb-4">
+        <p class="text-gray-600">Showing {{ accommodations.count }} of {{ accommodations.count }} accommodations</p>
+    </div>
+
+    <!-- Accommodations Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for accommodation in accommodations %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            {% if accommodation.images.first %}
+            <img src="{{ accommodation.images.first.image.url }}" alt="{{ accommodation.title }}" class="w-full h-48 object-cover">
+            {% else %}
+            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-500">No Image Available</span>
+            </div>
+            {% endif %}
+
+            <div class="p-4">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                        Available Now
+                    </span>
+                    {% if not accommodation.is_available %}
+                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                        Fully Booked
+                    </span>
+                    {% endif %}
+                </div>
+
+                <h3 class="text-xl font-semibold mb-2">{{ accommodation.landlord.landlordprofile.company_name }}</h3>
+                <p class="text-gray-600 mb-3">{{ accommodation.location }}</p>
+
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-xl md:text-2xl font-bold text-blue-600">R{{ accommodation.price }}/month</span>
+                    <a href="{% url 'accommodation_detail' accommodation.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-3 text-center py-12">
+            <div class="text-gray-500 text-lg mb-4">No accommodations found matching your criteria.</div>
+            <a href="{% url 'accommodation_list' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">
+                Clear Filters
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

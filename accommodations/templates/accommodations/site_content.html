@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-6">
+        <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <li><a href="{% url 'home' %}" class="hover:text-blue-600">Home</a></li>
+            <li class="flex items-center">
+                <svg class="w-4 h-4 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </li>
+            <li class="text-gray-900 font-medium">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Content Container -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white px-6 py-8">
+            <h1 class="text-4xl font-bold text-center">{{ content.title }}</h1>
+            <p class="text-blue-100 text-center mt-2">
+                Last updated: {{ content.last_updated|date:"F j, Y" }}
+            </p>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8 prose prose-lg max-w-none">
+            <!-- Safe filter allows HTML rendering -->
+            {{ content.content|safe }}
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-4 border-t">
+            <div class="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-600">
+                <!-- <p>Need help? <a href="mailto:support@studentpa.com" class="text-blue-600 hover:text-blue-800">Contact our support team</a></p> -->
+                <p class="mt-2 sm:mt-0">Last updated: {{ content.last_updated|date:"F j, Y" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation to other pages -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="{% url 'terms_and_conditions' %}"
+           class="bg-white p-4 rounded-lg shadow border-2 {% if title == 'Terms and Conditions' %}border-blue-500{% else %}border-gray-200{% endif %} hover:border-blue-300 transition-colors text-center">
+            <h3 class="font-semibold text-gray-900">Terms & Conditions</h3>
+        </a>
+        <a href="{% url 'privacy_policy' %}"
+           class="bg-white p-4 rounded-lg shadow border-2 {% if title == 'Privacy Policy' %}border-blue-500{% else %}border-gray-200{% endif %} hover:border-blue-300 transition-colors text-center">
+            <h3 class="font-semibold text-gray-900">Privacy Policy</h3>
+        </a>
+         <a href="{% url 'about_us' %}"
+           class="bg-white p-4 rounded-lg shadow border-2 {% if title == 'About Us' %}border-gray-200{% else %}border-gray-200{% endif %} hover:border-blue-300 transition-colors text-center">
+            <h3 class="font-semibold text-gray-900">About Us</h3>
+        </a>
+        <a href="{% url 'safety_guidelines' %}"
+           class="bg-white p-4 rounded-lg shadow border-2 {% if title == 'Safety Guidelines' %}border-gray-200{% else %}border-gray-200{% endif %} hover:border-blue-300 transition-colors text-center">
+            <h3 class="font-semibold text-gray-900">Safety Guidelines</h3>
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Custom prose styling for better readability */
+    .prose {
+        line-height: 1.75;
+    }
+    .prose h1 {
+        font-size: 2.25em;
+        font-weight: bold;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+        color: #1f2937;
+    }
+    .prose h2 {
+        font-size: 1.875em;
+        font-weight: bold;
+        margin-top: 1.5em;
+        margin-bottom: 0.5em;
+        color: #374151;
+    }
+    .prose h3 {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-top: 1.25em;
+        margin-bottom: 0.5em;
+        color: #4b5563;
+    }
+    .prose p {
+        margin-bottom: 1em;
+        color: #6b7280;
+    }
+    .prose ul, .prose ol {
+        margin-bottom: 1em;
+        padding-left: 1.5em;
+    }
+    .prose li {
+        margin-bottom: 0.5em;
+    }
+    .prose strong {
+        font-weight: bold;
+        color: #374151;
+    }
+    .prose em {
+        font-style: italic;
+    }
+    .prose u {
+        text-decoration: underline;
+    }
+    .prose a {
+        color: #3b82f6;
+        text-decoration: underline;
+    }
+    .prose a:hover {
+        color: #1d4ed8;
+    }
+</style>
+{% endblock %}

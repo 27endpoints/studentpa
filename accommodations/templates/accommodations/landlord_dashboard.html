@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Landlord Dashboard - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Landlord Dashboard</h1>
+        <a href="{% url 'accommodation_create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+            Add New Accommodation
+        </a>
+    </div>
+     
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">Total Listings</h3>
+            <p class="text-3xl font-bold">{{ total_listings }}</p>
+            <p class="text-sm text-gray-500 mt-1">All your accommodations</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">Approved</h3>
+            <p class="text-3xl font-bold text-green-600">{{ approved_listings }}</p>
+            <p class="text-sm text-gray-500 mt-1">Visible to students</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">Pending</h3>
+            <p class="text-3xl font-bold text-yellow-600">{{ pending_listings }}</p>
+            <p class="text-sm text-gray-500 mt-1">Awaiting approval</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-600 mb-2">Available Rooms</h3>
+            <p class="text-3xl font-bold text-blue-600">{{ available_rooms }}</p>
+            <p class="text-sm text-gray-500 mt-1">Ready to book</p>
+        </div>
+    </div>
+<!-- Profile Status Card -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-xl font-semibold mb-2">Your Profile</h2>
+            <p class="text-gray-600">
+                {% if user.landlordprofile.phone_number %}
+                ✅ Phone number is set up for student contacts
+                {% else %}
+                ⚠️ Add your phone number to receive direct calls from students
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'landlord_profile_update' %}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+            Update Profile
+        </a>
+    </div>
+    
+    {% if not user.landlordprofile.phone_number %}
+    <div class="mt-4 bg-yellow-50 border border-yellow-200 rounded-md p-4">
+        <p class="text-sm text-yellow-700">
+            <strong>Tip:</strong> Students prefer landlords with phone numbers. 
+            Adding your number increases response rates and makes you more accessible.
+        </p>
+    </div>
+    {% endif %}
+</div>
+    <!-- Accommodations Table -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-semibold">My Accommodations</h2>
+        </div>
+        
+        {% if accommodations %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Rooms</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for accommodation in accommodations %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ accommodation.landlord.landlordprofile.company_name }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">{{ accommodation.location }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900">{{ accommodation.get_room_type_display }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm font-medium text-gray-900">R{{ accommodation.price }}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="text-sm text-gray-900 {% if accommodation.available_rooms == 0 %}text-red-600 font-semibold{% endif %}">
+                                {{ accommodation.available_rooms }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if accommodation.is_approved %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Approved
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Pending Approval
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <a href="{% url 'accommodation_update' accommodation.pk %}" class="text-blue-600 hover:text-blue-900">Edit</a>
+                            <a href="{% url 'accommodation_detail' accommodation.pk %}" class="text-green-600 hover:text-green-900">View</a>
+                            <a href="{% url 'accommodation_delete' accommodation.pk %}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+
+                       <td class="px-6 py-4 whitespace-nowrap">
+                      {% if accommodation.is_featured %}
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                      ⭐ Featured
+                      </span>
+                     {% else %}
+                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                     Standard
+                     </span>
+                    {% endif %}
+                    </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="text-gray-500 text-lg mb-4">You haven't listed any accommodations yet.</div>
+            <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                Start by adding your first accommodation. Once approved by our admin team, it will be visible to students.
+            </p>
+            <a href="{% url 'accommodation_create' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                Add Your First Accommodation
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Important Information Box -->
+    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-2">Dashboard Overview</h3>
+        <ul class="text-blue-700 list-disc list-inside space-y-1">
+            <li><strong>Total Listings:</strong> Count of all your accommodation listings</li>
+            <li><strong>Approved:</strong> Listings that are visible to students</li>
+            <li><strong>Pending:</strong> Listings waiting for admin approval</li>
+            <li><strong>Available Rooms:</strong> Total number of rooms available for booking across all approved listings</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

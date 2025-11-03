@@ -1,0 +1,21 @@
+
+# 1. Environment and Secrets
+.env
+*.sqlite3
+
+# 2. Virtual Environment and Python Files
+virtenv/
+.virtenv/
+__pycache__/
+*.pyc
+
+# 3. Static and Media Files
+media/
+staticfiles/
+# 4. IDE and Editor Configurations
+.vscode/
+.idea/
+*.swp
+.DS_Store
+# 5. Logs and Database Files
+*.log

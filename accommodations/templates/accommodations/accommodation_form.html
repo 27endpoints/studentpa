@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ accommodation.company_name }} - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- <h1 class="text-2xl font-bold mb-6">{{ title }}</h1> -->
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                
+                <!-- Description -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description *</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                    <div class="text-red-600 text-sm mt-1">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Room Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Room Type *</label>
+                    {{ form.room_type }}
+                    {% if form.room_type.errors %}
+                    <div class="text-red-600 text-sm mt-1">{{ form.room_type.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location *</label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                    <div class="text-red-600 text-sm mt-1">{{ form.location.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Price -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Price per Month (R) *</label>
+                    {{ form.price }}
+                    {% if form.price.errors %}
+                    <div class="text-red-600 text-sm mt-1">{{ form.price.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Available Rooms -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Available Rooms *</label>
+                    {{ form.available_rooms }}
+                    {% if form.available_rooms.errors %}
+                    <div class="text-red-600 text-sm mt-1">{{ form.available_rooms.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Image Upload Section -->
+            <div class="border-t pt-6 mb-6">
+                <h2 class="text-xl font-semibold mb-4">Accommodation Images</h2>
+                <p class="text-gray-600 mb-4">Upload images of your accommodation. The first image will be used as the main photo.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Image 1 (Required) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Building Exterior *
+                            <span class="text-xs text-blue-600 ml-1">(This will be the cover photo)</span>
+                        </label>
+                        {{ form.image_1 }}
+                        {% if form.image_1.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.image_1.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Image 2 (Optional) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Room Interior *</label>
+                        {{ form.image_2 }}
+                        {% if form.image_2.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.image_2.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Image 3 (Optional) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Toilet/bathrooms *</label>
+                        {{ form.image_3 }}
+                        {% if form.image_3.errors %}
+                        <div class="text-red-600 text-sm mt-1">{{ form.image_3.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Note -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">Important</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <p>Your accommodation listing will be reviewed by our admin team before it becomes visible to students. This usually takes 24-48 hours.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'landlord_dashboard' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+                    Save Accommodation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input, select, textarea {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        background-color: white;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+        outline: none;
+        ring: 2px;
+        ring-color: #3b82f6;
+        border-color: #3b82f6;
+    }
+    
+    input[type="file"] {
+        padding: 0.375rem 0.75rem;
+    }
+</style>
+{% endblock %}

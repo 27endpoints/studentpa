@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Choose Your Role - StudentPA{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Join StudentPA
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Choose how you want to use our platform
+            </p>
+        </div>
+
+        <form class="mt-8 space-y-6" method="post">
+            {% csrf_token %}
+            
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                {% for choice in form.role %}
+                <label class="flex items-center p-6 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 cursor-pointer">
+                    <input type="radio" name="role" value="{{ choice.data.value }}" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                    <div class="ml-4">
+                        <span class="block text-sm font-medium text-gray-900">
+                            {{ choice.choice_label }}
+                        </span>
+                        {% if choice.data.value == 'student' %}
+                        <span class="block text-sm text-gray-500 mt-1">
+                            Find and book your perfect student accommodation
+                        </span>
+                        {% else %}
+                        <span class="block text-sm text-gray-500 mt-1">
+                            List and manage your student accommodations
+                        </span>
+                        {% endif %}
+                    </div>
+                </label>
+                {% endfor %}
+            </div>
+
+            {% if form.role.errors %}
+            <div class="bg-red-50 border border-red-200 rounded-md p-4">
+                <p class="text-sm text-red-600">{{ form.role.errors.0 }}</p>
+            </div>
+            {% endif %}
+
+            <div>
+                <button type="submit" 
+                        class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Continue
+                </button>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                        Sign in here
+                    </a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

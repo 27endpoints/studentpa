@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Accommodation - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h1 class="text-2xl font-bold text-red-600 mb-4">Delete Accommodation</h1>
+        
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+            <p class="text-red-800 font-semibold">Are you sure you want to delete this accommodation?</p>
+            <p class="text-red-700 mt-2">"{{ accommodation.landlord.landlordprofile.company_name }}"</p>
+            <p class="text-red-600 text-sm mt-2">This action cannot be undone.</p>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="flex justify-end space-x-4">
+                <a href="{% url 'landlord_dashboard' %}" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400">
+                    Cancel
+                </a>
+                <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700">
+                    Delete Accommodation
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="relative bg-cover bg-center h-96" style="background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 h-full flex items-center">
+        <div class="text-white">
+            <h1 class="text-2xl md:text-5xl text-center font-bold mb-4">Welcome to Student Accommodations at Kwa-Dlwangezwa</h1>
+            <p class="text-base md:text-xl text-center mb-8">Find your perfect home away from home. Affordable, and convenient student housing options tailored for your university life.</p>
+            <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center text-center">
+            <a href="{% url 'accommodation_list' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                    Browse Rooms
+                </a>
+                {% if not user.is_authenticated %}
+                <a href="{% url 'register_role_selection' %}" class="bg-transparent text-center border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-gray-900 font-semibold">
+                    Join Now
+                </a>
+                {% else %}
+                    {% if user.groups.all.0.name == 'Landlords' %}
+                    <a href="{% url 'landlord_dashboard' %}" class="bg-transparent border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-gray-900 font-semibold">
+                        My Dashboard
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accommodation_list' %}" class="bg-transparent border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-gray-900 font-semibold">
+                        Find Accommodation
+                    </a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="featured" class="max-w-7xl mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Featured Accommodations</h2>
+        <p class="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover our handpicked selection of premium student accommodations at Kwa-Dlwangezwa.
+        </p>
+    </div>
+
+    {% if featured_accommodations %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {% for accommodation in featured_accommodations %}
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            <!-- Featured Badge -->
+            <div class="relative">
+                {% if accommodation.images.first %}
+                <img src="{{ accommodation.images.first.image.url }}" alt="{{ accommodation.title }}" class="w-full h-48 object-cover">
+                {% else %}
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-500">No Image Available</span>
+                </div>
+                {% endif %}
+                <div class="absolute top-3 right-3">
+                    <span class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                        ⭐ Featured
+                    </span>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-3">
+                    <h3 class="text-xl font-semibold text-gray-900">{{ accommodation.landlord.landlordprofile.company_name }}</h3>
+                    {% if accommodation.is_available %}
+                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                        Available
+                    </span>
+                    {% else %}
+                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
+                        Booked
+                    </span>
+                    {% endif %}
+                </div>
+
+                <p class="text-base md:text-gray-600 mb-4 flex items-center">
+                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                    {{ accommodation.location }}
+                </p>
+
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xl md:text-2xl font-bold text-blue-600">R{{ accommodation.price }}/month</span>
+                    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {{ accommodation.get_room_type_display }}
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <span class="text-sm text-gray-500">
+                        {{ accommodation.available_rooms }} room{{ accommodation.available_rooms|pluralize }} available
+                    </span>
+                    <a href="{% url 'accommodation_detail' accommodation.pk %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 text-sm font-semibold">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center mt-8">
+        <a href="{% url 'accommodation_list' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold">
+            View All Accommodations
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </a>
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="text-gray-500 text-lg mb-4">No featured accommodations available at the moment.</div>
+        <p class="text-base md:text-lg text-gray-600 mb-6 max-w-md mx-auto">
+            Check back soon for our featured student accommodations, or browse all available listings.
+        </p>
+        <a href="{% url 'accommodation_list' %}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+            Browse All Listings
+        </a>
+    </div>
+    {% endif %}
+</section>
+
+<!-- Additional Section: How It Works -->
+<section class="bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">How StudentPA Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-semibold mb-2">Find Accommodation</h3>
+                <p class="text-base md:text-lg text-gray-600">Browse verified student accommodations with detailed information and photos.</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-semibold mb-2">Contact Landlords</h3>
+                <p class="text-base md:text-lg text-gray-600">Get in touch with landlords directly to ask questions and schedule viewings.</p>
+            </div>
+            <div class="text-center">
+                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg md:text-xl font-semibold mb-2">Move In</h3>
+                <p class="text-base md:text-lg text-gray-600">Secure your perfect student accommodation and focus on your studies.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

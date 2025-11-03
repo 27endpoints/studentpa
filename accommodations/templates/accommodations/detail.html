@@ -1,0 +1,558 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ accommodation.company_name }} - StudentPA{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Back Button -->
+    <a href="{% url 'accommodation_list' %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
+        ← Back to listings
+    </a>
+
+    <!-- Approval Status Banner (only show if not approved) -->
+    {% if not accommodation.is_approved %}
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800">Pending Approval</h3>
+                <div class="mt-2 text-sm text-yellow-700">
+                    <p>This accommodation is currently pending admin approval and is not visible to students yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Images -->
+        <div class="relative">
+            {% if accommodation.images.all %}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-2 p-2">
+                <div class="lg:col-span-2">
+                    {% with accommodation.images.filter|first as primary_image %}
+                    {% with accommodation.images.first as first_image %}
+                    <img src="{% if primary_image %}{{ primary_image.image.url }}{% else %}{{ first_image.image.url }}{% endif %}"
+                         alt="{{ accommodation.title }}"
+                         class="w-full h-96 object-cover rounded-lg">
+                    {% endwith %}
+                    {% endwith %}
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    {% for image in accommodation.images.all|slice:"1:5" %}
+                    <img src="{{ image.image.url }}" alt="{{ accommodation.title }}" class="w-full h-48 object-cover rounded-lg">
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="w-full h-96 bg-gray-200 flex items-center justify-center rounded-lg">
+                <span class="text-gray-500 text-lg">No Images Available</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Content -->
+        <div class="p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h3 class="text-xl font-bold mb-2">{{ accommodation.landlord.landlordprofile.company_name }}</h3>
+                    <p class="text-gray-600 text-lg">{{ accommodation.location }}</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xl font-bold text-blue-600">R{{ accommodation.price }}/month</span>
+                    <div class="mt-2">
+                        {% if accommodation.is_available %}
+                        <span class="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded">
+                            Available Now
+                        </span>
+                        {% else %}
+                        <span class="bg-red-100 text-red-800 text-sm font-medium px-3 py-1 rounded">
+                            Fully Booked
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Info -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+                <div>
+                    <span class="block text-sm text-gray-600">Room Type</span>
+                    <span class="font-semibold">{{ accommodation.get_room_type_display }}</span>
+                </div>
+                <div>
+                    <span class="block text-sm text-gray-600">Available Rooms</span>
+                    <span class="font-semibold">{{ accommodation.available_rooms }}</span>
+                </div>
+                <div>
+                    <span class="block text-sm text-gray-600">Location</span>
+                    <span class="font-semibold">{{ accommodation.location }}</span>
+                </div>
+                <div>
+                    <span class="block text-sm text-gray-600">Status</span>
+                    <span class="font-semibold">
+                        {% if accommodation.is_approved %}
+                            <span class="text-green-600">Approved</span>
+                        {% else %}
+                            <span class="text-yellow-600">Pending</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-3">Description</h2>
+                <p class="text-gray-700 leading-relaxed">{{ accommodation.description|linebreaks }}</p>
+            </div>
+
+            <!-- Contact Action (only show if approved and available) -->
+                       <!-- Contact Action (only show if approved, available, and user is not the landlord) -->
+            {% if accommodation.is_approved and accommodation.is_available %}
+                {% if user.is_authenticated and user != accommodation.landlord %}
+                  <div class="border-t pt-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                            <div>
+                                 <h3 class="text-lg font-semibold">Interested in this accommodation?</h3>
+                                 <p class="text-gray-600">Contact the landlord for more information</p>
+                            </div>
+                         <button onclick="openSafetyAgreement()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                          Contact Landlord
+                         </button>
+                        </div>
+                   </div>
+               {% elif not user.is_authenticated %}
+                  <div class="border-t pt-6">
+                      <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                        <div>
+                          <h3 class="text-lg font-semibold">Interested in this accommodation?</h3>
+                          <p class="text-gray-600">Sign in to contact the landlord</p>
+                       </div>
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                        Sign In to Contact
+                        </a>
+                      </div>
+                 </div>
+               {% endif %}
+           {% endif %}
+
+            <!-- Owner Actions (only show if user is the landlord) -->
+            {% if user == accommodation.landlord %}
+            <div class="border-t pt-6 mt-6">
+                <h3 class="text-lg font-semibold mb-4">Owner Actions</h3>
+                <div class="flex space-x-4">
+                    <a href="{% url 'accommodation_update' accommodation.pk %}"
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Edit Accommodation
+                    </a>
+                    <a href="{% url 'landlord_dashboard' %}"
+                       class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+                        Back to Dashboard
+                    </a>
+                </div>
+
+                {% if not accommodation.is_approved %}
+                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <p class="text-sm text-blue-700">
+                        <strong>Note:</strong> Your accommodation is pending admin approval.
+                        Students cannot see this listing until it's approved.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Full Screen Safety Agreement Modal -->
+<div id="safetyAgreementModal" class="fixed inset-0 bg-white z-50 hidden overflow-y-auto">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-lg">
+            <div class="max-w-4xl mx-auto flex justify-between items-center">
+                <h1 class="text-xl font-bold">Safety Agreement Required</h1>
+                <button onclick="closeSafetyAgreement()" class="text-white hover:text-blue-200 p-2 rounded-full hover:bg-blue-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="max-w-4xl mx-auto p-4 py-8">
+            <!-- Critical Warning -->
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 shadow-sm">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-8 w-8 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg md:text-xl  font-bold text-red-800 mb-2">Critical Safety Information</h3>
+                        <p class="text-red-700 text-sm">Your safety is our top priority. Please read these safety guidelines carefully before proceeding to contact any landlord.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safety Guidelines -->
+            <div class="space-y-6 mb-8">
+                <!-- Financial Safety -->
+                <div class="bg-white border-2 border-yellow-400 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-yellow-100 p-3 rounded-lg mr-4">
+                            <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-3">Financial Safety Guidelines</h2>
+                            <ul class="space-y-3 text-lg text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-red-500 font-bold mr-3 mt-1">✗</span>
+                                    <span class="text-sm"><strong>Never send money</strong> or make any payments before viewing the property in person</span>
+                                </li>
+
+                                <li class="flex items-start">
+                                    <span class="text-red-500 font-bold mr-3 mt-1">✗</span>
+                                    <span class="text-sm"><strong>Avoid landlords</strong> requesting wire transfers, cryptocurrency, or gift cards as payment</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-red-500 font-bold mr-3 mt-1">✗</span>
+                                    <span class="text-sm"><strong>Verify the landlord's identity</strong> matches property ownership records before any transaction</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Viewing Safety -->
+                <div class="bg-white border-2 border-blue-400 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-3">Property Viewing Safety</h2>
+                            <ul class="space-y-3 text-lg text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Always schedule viewings during daylight hours</strong> (9 AM - 5 PM recommended)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Bring at least one friend or family member</strong> with you to all viewings</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Meet only at the actual property address</strong> listed in the accommodation details</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-red-500 font-bold mr-3 mt-1">✗</span>
+                                    <span class="text-sm"><strong>Never meet in remote locations</strong>, parking lots, or properties not matching the listing</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Inform someone trustworthy</strong> of your exact whereabouts and expected return time</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Guidelines -->
+                <div class="bg-white border-2 border-green-400 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-start mb-4">
+                        <div class="bg-green-100 p-3 rounded-lg mr-4">
+                            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-3">Verification & Due Diligence</h2>
+                            <ul class="space-y-3 text-lg text-gray-700">
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Verify the property exists</strong> and matches the photos in the listing</span>
+                                </li>
+
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Check that the person showing the property</strong> has proper access and authority</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <span class="text-green-500 font-bold mr-3 mt-1">✓</span>
+                                    <span class="text-sm"><strong>Trust your instincts</strong> - if something feels wrong or too good to be true, leave immediately</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Disclaimer -->
+                <div class="bg-purple-50 border-2 border-purple-400 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-start">
+                        <div class="bg-purple-100 p-3 rounded-lg mr-4">
+                            <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg md:text-xl font-bold text-purple-800 mb-3">Important Platform Disclaimer</h2>
+                            <p class="text-sm text-purple-700 leading-relaxed">
+                                <strong>StudentPA acts only as a platform to connect students with landlords.</strong>
+                                We do not guarantee verification of individual listings, landlords, or property ownership.
+                                You are solely responsible for your own safety, due diligence, and all transactions.
+                                We strongly recommend conducting thorough background checks and using official rental contracts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Agreement Section -->
+            <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-300 mb-8">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Safety Agreement</h3>
+
+                <div class="space-y-4">
+                    <label class="flex items-start bg-white p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer">
+                        <input type="checkbox" id="safetyAgreementCheckbox" class="mt-1 mr-4 w-6 h-6 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        <span class="text-sm text-gray-700 leading-relaxed">
+                            <strong>I confirm that I have carefully read and fully understand all the safety guidelines outlined above.</strong>
+                            I agree to follow these safety protocols when contacting landlords and viewing properties.
+                            I understand that StudentPA provides only a connection platform and is not responsible for any transactions,
+                            interactions, or safety incidents between me and landlords.
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center sticky bottom-0 bg-white p-4 border-t shadow-lg -mx-4 -mb-8">
+                <button onclick="closeSafetyAgreement()" class="px-8 py-4 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors text-lg font-semibold flex-1 max-w-md">
+                    Cancel - Return to Listing
+                </button>
+                <button onclick="proceedToContact()" id="agreeButton" disabled class="px-8 py-4 bg-gray-400 text-white rounded-lg cursor-not-allowed transition-colors text-lg font-semibold flex-1 max-w-md">
+                    I Understand & Agree - Show Contact Details
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Full Screen Contact Details Modal -->
+<div id="contactDetailsModal" class="fixed inset-0 bg-white z-50 hidden overflow-y-auto">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <div class="bg-green-600 text-white p-4 sticky top-0 z-10 shadow-lg">
+            <div class="max-w-4xl mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Contact Landlord</h1>
+                <button onclick="closeContactDetails()" class="text-white hover:text-green-200 p-2 rounded-full hover:bg-green-700 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="max-w-4xl mx-auto p-4 py-8">
+            <!-- Success Message -->
+            <div class="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
+                <div class="flex items-center">
+                    <svg class="h-8 w-8 text-green-500 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div>
+                        <h3 class="text-lg font-bold text-green-800">Safety Agreement Accepted</h3>
+                        <p class="text-green-700">You can now contact the landlord using the information below.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 text-center">Contact Details</h2>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    <!-- Landlord Information -->
+                    <div class="space-y-6">
+                        <div class="bg-blue-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-blue-800 mb-2 text-lg">Landlord Information</h3>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm text-gray-600">Name</p>
+                                    <p class="text-lg font-semibold text-gray-900">{{ accommodation.landlord.get_full_name|default:accommodation.landlord.username }}</p>
+                                </div>
+
+                                {% if accommodation.landlord.landlordprofile.company_name %}
+                                <div>
+                                    <p class="text-sm text-gray-600">Company</p>
+                                    <p class="text-lg text-gray-900">{{ accommodation.landlord.landlordprofile.company_name }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Email Contact -->
+                        <!-- <div class="bg-purple-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-purple-800 mb-2 text-lg">Email Contact</h3>
+                            <a href="mailto:{{ accommodation.landlord.email }}?subject=Inquiry about {{ accommodation.title|urlencode }}&body=Hello, I'm interested in your accommodation '{{ accommodation.title }}' listed on StudentPA."
+                               class="text-xl font-semibold text-purple-700 break-all hover:text-purple-800 transition-colors block mb-2">
+                                {{ accommodation.landlord.email }}
+                            </a>
+                            <p class="text-sm text-purple-600">Pre-filled subject for your convenience</p>
+                        </div> -->
+                    </div>
+
+                    <!-- Phone Contact -->
+                    <div class="space-y-6">
+                        {% if accommodation.landlord.landlordprofile.phone_number %}
+                        <div class="bg-green-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-green-800 mb-4 text-lg">Direct Phone Contact</h3>
+
+                            <!-- Phone Number Display -->
+                            <!-- <p class="text-2xl font-bold text-green-700 text-center mb-4">
+                                {{ accommodation.landlord.landlordprofile.phone_number }}
+                            </p> -->
+
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Call Button -->
+                                <a href="tel:{{ accommodation.landlord.landlordprofile.phone_number }}"
+                                   class="bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors text-center flex items-center justify-center space-x-2">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                    </svg>
+                                    <span>Call</span>
+                                </a>
+
+                                <!-- WhatsApp Button -->
+                                <a href="https://wa.me/{{ accommodation.landlord.landlordprofile.phone_number|cut:' '|cut:'+'|cut:'-'|cut:'('|cut:')' }}?text=Hello, I'm interested in your accommodation '{{ accommodation.title }}' listed on StudentPA."
+                                   target="_blank"
+                                   class="bg-[#25D366] text-white py-3 px-4 rounded-lg hover:bg-green-600 transition-colors text-center flex items-center justify-center space-x-2">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893-.001-3.189-1.262-6.189-3.553-8.449"></path>
+                                    </svg>
+                                    <span>WhatsApp</span>
+                                </a>
+                            </div>
+
+                            <p class="text-sm text-green-600 text-center mt-3">
+                                Tap to call or message directly
+                            </p>
+                        </div>
+                        {% else %}
+                        <div class="bg-gray-100 rounded-lg p-4 text-center">
+                            <svg class="w-12 h-12 text-gray-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                            </svg>
+                            <p class="text-gray-600 font-semibold">Phone Not Available</p>
+                            <p class="text-sm text-gray-500 mt-1">This landlord hasn't added a phone number yet</p>
+                        </div>
+                        {% endif %}
+
+                        <!-- Property Reference -->
+                        <div class="bg-orange-50 rounded-lg p-4">
+                            <h3 class="font-semibold text-orange-800 mb-2 text-lg">Property Reference</h3>
+                            <p class="text-lg text-orange-700 font-semibold">{{ accommodation.title }}</p>
+                            <p class="text-sm text-orange-600 mt-1">
+                                Mention this accommodation when contacting the landlord
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Safety Reminder -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-8">
+                <h3 class="text-lg font-bold text-yellow-800 mb-3">Final Safety Reminder</h3>
+                <ul class="text-yellow-700 space-y-2 text-lg">
+                    <li>• Remember to follow all safety guidelines during communications and viewings</li>
+                    <li>• Never share sensitive personal information unnecessarily</li>
+                    <li>• Report any suspicious behavior to local authorities and our platform</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center sticky bottom-0 bg-white p-4 border-t shadow-lg -mx-4 -mb-8">
+                <button onclick="closeContactDetails()" class="px-8 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-lg font-semibold flex-1 max-w-md">
+                    Close - Return to Listing
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Safety Agreement Modal Functions
+    function openSafetyAgreement() {
+        document.getElementById('safetyAgreementModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    function closeSafetyAgreement() {
+        document.getElementById('safetyAgreementModal').classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+        // Reset checkbox
+        document.getElementById('safetyAgreementCheckbox').checked = false;
+        updateAgreeButton();
+    }
+
+    function proceedToContact() {
+        if (document.getElementById('safetyAgreementCheckbox').checked) {
+            closeSafetyAgreement();
+            // Show contact details after a brief delay
+            setTimeout(() => {
+                document.getElementById('contactDetailsModal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }, 300);
+        }
+    }
+
+    // Contact Details Modal Functions
+    function closeContactDetails() {
+        document.getElementById('contactDetailsModal').classList.add('hidden');
+        document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    // Update agree button state based on checkbox
+    function updateAgreeButton() {
+        const checkbox = document.getElementById('safetyAgreementCheckbox');
+        const agreeButton = document.getElementById('agreeButton');
+
+        if (checkbox.checked) {
+            agreeButton.disabled = false;
+            agreeButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            agreeButton.classList.add('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+            agreeButton.textContent = 'I Understand & Agree - Show Contact Details';
+        } else {
+            agreeButton.disabled = true;
+            agreeButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+            agreeButton.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'cursor-pointer');
+            agreeButton.textContent = 'I Understand & Agree - Show Contact Details';
+        }
+    }
+
+    // Initialize event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('safetyAgreementCheckbox');
+        checkbox.addEventListener('change', updateAgreeButton);
+    });
+</script>
+
+<style>
+    /* Smooth transitions for modals */
+    #safetyAgreementModal, #contactDetailsModal {
+        transition: opacity 0.3s ease;
+    }
+</style>
+{% endblock %}
