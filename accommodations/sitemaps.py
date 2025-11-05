@@ -25,9 +25,6 @@ class StaticViewSitemap(Sitemap):
             "landlord_dashboard",
             "landlord_profile_update",
             "accommodation_create",
-            "accommodation_update",
-            "accommodation_delete",
-            "accommodation_preview",
             
             # Content pages
             "terms_and_conditions",
