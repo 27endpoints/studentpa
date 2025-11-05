@@ -20,8 +20,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from accommodations import views
-
+from django.views.generic import TemplateView
 urlpatterns = [
+    path("google9f82cf14bb3d512f.html", TemplateView.as_view(template_name="google9f82cf14bb3d512f.html")),
     path('admin/', admin.site.urls),
     path('', views.landing_page, name='home'),
 
