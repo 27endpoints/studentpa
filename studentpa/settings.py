@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECURITY_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['studentpa.render.com', 'www.studentpa.online', 'studentpa.online']
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
 # SESSIONS
