@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.urls import reverse
+
 
 class SiteContent(models.Model):
     CONTENT_TYPES = [
@@ -92,6 +94,9 @@ class Accommodation(models.Model):
 
     def __str__(self):
         return f"{self.landlord.landlordprofile.company_name} - {self.location}"
+    
+    def get_absolute_url(self):
+        return reverse("accommodation_detail", kwargs={"pk": self.pk})
 
 class AccommodationImage(models.Model):
     accommodation = models.ForeignKey(Accommodation, related_name='images', on_delete=models.CASCADE)

@@ -21,6 +21,12 @@ from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from accommodations import views
 from django.views.generic import TemplateView
+from django.contrib.sitemaps.views import sitemap
+from core.sitemaps import StaticViewSitemap, AccommodationSitemap
+
+
+
+
 urlpatterns = [
     path("google9f82cf14bb3d512f.html", TemplateView.as_view(template_name="google9f82cf14bb3d512f.html")),
     path('admin/', admin.site.urls),
@@ -53,6 +59,18 @@ urlpatterns = [
 
 
 ]
+
+
+
+sitemaps = {
+    "static": StaticViewSitemap(),
+    "accommodations": AccommodationSitemap(),
+}
+
+urlpatterns += [
+    path("sitemap.xml", sitemap, {"sitemaps": sitemaps}, name="django.contrib.sitemaps.views.sitemap"),
+]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
