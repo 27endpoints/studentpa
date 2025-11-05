@@ -33,6 +33,7 @@ DEBUG=True
 ALLOWED_HOSTS = ['studentpa.onrender.com',
                   'www.studentpa.online', 
                   'studentpa.online']
+# reCAPTCHA KEYS
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
 # SESSIONS
