@@ -12,15 +12,9 @@ class StaticViewSitemap(Sitemap):
     def items(self):
         # List all named URLs that should appear in the sitemap
         return [
-            # Authentication
-            "login",
-            "logout",
-            "register",
-            "register_role_selection",
-            "register_student",
-            "register_landlord",
             
             # Accommodation
+            "home",
             "accommodation_list",
             "landlord_dashboard",
             "landlord_profile_update",
