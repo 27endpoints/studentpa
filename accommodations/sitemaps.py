@@ -22,7 +22,6 @@ class StaticViewSitemap(Sitemap):
             
             # Accommodation
             "accommodation_list",
-            "accommodation_detail",  # note: detail pages are dynamic, we'll handle separately
             "landlord_dashboard",
             "landlord_profile_update",
             "accommodation_create",
