@@ -22,7 +22,7 @@ from django.contrib.auth import views as auth_views
 from accommodations import views
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from core.sitemaps import StaticViewSitemap, AccommodationSitemap
+from accommodations.sitemaps import StaticViewSitemap, AccommodationSitemap
 
 
 
