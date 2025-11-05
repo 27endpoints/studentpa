@@ -56,11 +56,16 @@ urlpatterns = [
     path('privacy/', views.privacy_policy, name='privacy_policy'),
     path('about/', views.about_us, name='about_us'),
     path('safety/', views.safety_guidelines, name='safety_guidelines'),
+    
 
 
 ]
 
-
+urlpatterns += [
+    path("robots.txt", TemplateView.as_view(
+        template_name="robots.txt",
+        content_type="text/plain"
+    )),]
 
 sitemaps = {
     "static": StaticViewSitemap(),
