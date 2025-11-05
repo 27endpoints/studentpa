@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.urls import reverse
 
 
 class SiteContent(models.Model):
@@ -96,6 +95,7 @@ class Accommodation(models.Model):
         return f"{self.landlord.landlordprofile.company_name} - {self.location}"
     
     def get_absolute_url(self):
+        from django.urls import reverse
         return reverse("accommodation_detail", kwargs={"pk": self.pk})
 
 class AccommodationImage(models.Model):
