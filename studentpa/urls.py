@@ -23,6 +23,8 @@ from accommodations import views
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
 from accommodations.sitemaps import StaticViewSitemap, AccommodationSitemap
+from seo.sitemaps import RegionSitemap, SubregionSitemap
+
 
 
 
@@ -69,9 +71,12 @@ urlpatterns += [
         content_type="text/plain"
     )),]
 
+
 sitemaps = {
     "static": StaticViewSitemap(),
     "accommodations": AccommodationSitemap(),
+    "regions": RegionSitemap(),
+    "subregions": SubregionSitemap(),
 }
 
 urlpatterns += [

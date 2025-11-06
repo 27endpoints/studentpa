@@ -5,6 +5,7 @@ from .models import Accommodation
 
 
 
+
 class StaticViewSitemap(Sitemap):
     priority = 0.8
     changefreq = "weekly"
