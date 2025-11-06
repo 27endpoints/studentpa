@@ -141,3 +141,8 @@ class SiteContentAdmin(admin.ModelAdmin):
         }),
     )
 
+# Customize admin site
+admin.site.site_header = "StudentPA Admin"
+admin.site.site_title = "StudentPA Admin Portal"
+# admin.site.site_title = "Clothing Exchange"
+admin.site.index_title = "Welcome to StudentPA Administration"
