@@ -1,0 +1,20 @@
+[
+  {
+    "model": "seo.region",
+    "pk": 1,
+    "fields": { "name": "KwaDlangezwa" }
+  },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Mall" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Ezitolo" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Emathuneni" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Mgwazeni" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Ezangomeni" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "KwaBrown" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Emhlathuze" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "EMaingate" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "ECrossin" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Emthunzini" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "River View" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Eskhawini" } },
+  { "model": "seo.subregion", "fields": { "region": 1, "name": "Blue Towers" } }
+]

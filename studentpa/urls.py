@@ -31,6 +31,8 @@ urlpatterns = [
     path("google9f82cf14bb3d512f.html", TemplateView.as_view(template_name="google9f82cf14bb3d512f.html")),
     path('admin/', admin.site.urls),
     path('', views.landing_page, name='home'),
+    path("area/", include("seo.urls")),
+
 
     # Authentication URLs
     path('login/', auth_views.LoginView.as_view(template_name='auth/login.html'), name='login'),

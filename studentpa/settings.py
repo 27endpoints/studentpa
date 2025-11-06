@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     'accommodations',
     'django_recaptcha',
+    'seo',
 
 ]
 SITE_ID = 1

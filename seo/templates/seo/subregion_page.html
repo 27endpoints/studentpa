@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Student Housing in {{ subregion.name }}, {{ region.name }} | StudentPA{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Find safe and affordable student accommodation in {{ subregion.name }}, {{ region.name }}. Compare rooms, prices, and contact landlords directly. Landlords list for free.">
+<meta property="og:title" content="Student Housing in {{ subregion.name }} | StudentPA">
+<meta property="og:description" content="Private rentals, shared rooms, and student housing near campus.">
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">
+        Student Housing in {{ subregion.name }} ({{ region.name }})
+    </h1>
+
+    <p class="text-gray-700 leading-relaxed mb-6">
+        Looking for student accommodation in <strong>{{ subregion.name }}</strong>? 
+        Browse safe and affordable private rentals, shared rooms, and apartments near campus. 
+        Contact landlords directly — no agent fees.
+    </p>
+
+    <a href="/area/{{ region.name }}/{{ sub.name }}/"
+       class="inline-block bg-blue-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-blue-700 transition mb-8">
+        View Rooms in {{ subregion.name }}
+    </a>
+
+    <hr class="my-8">
+
+    <h2 class="text-xl font-semibold text-gray-800 mb-3">
+        More areas in {{ region.name }}
+    </h2>
+
+    <ul class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-12">
+        {% for sub in region.subregions.all %}
+            <li>
+                <a href="/area/{{ region.name }}/{{ sub.name }}/"
+                   class="block bg-gray-50 border rounded-lg p-3 text-center hover:border-blue-500 hover:shadow transition">
+                    {{ sub.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-yellow-900 mb-2">Are you a landlord in {{ subregion.name }}?</h3>
+        <p class="text-yellow-900 mb-4">
+            Get verified and list your student rooms for free. 
+            Reach students in minutes
+        </p>
+        <a href="/register/landlord/" 
+           class="inline-block bg-yellow-600 text-white px-5 py-2 rounded-lg hover:bg-yellow-700">
+            List Your Accommodation
+        </a>
+    </div>
+</div>
+
+{% endblock %}
