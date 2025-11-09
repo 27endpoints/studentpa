@@ -4,12 +4,16 @@ from django.contrib.auth import login
 from django.contrib.auth.models import Group
 from django.contrib import messages
 from django.db.models import Q, Sum
+
+from studentpa import settings
 from .models import Accommodation, SiteContent, Location, LandlordProfile, StudentProfile, AccommodationImage
 from .forms import (AccommodationForm, RoleSelectionForm,
                    StudentRegistrationForm, LandlordRegistrationForm,
                    AccommodationWithImagesForm)
 from accommodations import models
 from django.utils import timezone
+from .models import SubmissionHistory 
+
 
 def is_landlord(user):
     return user.groups.filter(name='Landlords').exists() or user.is_superuser
@@ -191,6 +195,11 @@ def landlord_dashboard(request):
 
     accommodations = Accommodation.objects.filter(landlord=request.user)
 
+     # ✅ Get persistent submission history
+    recent_submissions = SubmissionHistory.objects.filter(
+        landlord=request.user
+    ).order_by('-submitted_at')[:10]  # Last 10 submissions
+    
     # Calculate proper stats
     total_listings = accommodations.count()
     approved_listings = accommodations.filter(is_approved=True).count()
@@ -208,6 +217,15 @@ def landlord_dashboard(request):
         'approved_listings': approved_listings,
         'pending_listings': pending_listings,
         'available_rooms': available_rooms,
+        'recent_submissions': recent_submissions,
+         # banking details to context
+        'bank_name': settings.BUSINESS_BANK_NAME,
+        'account_name': settings.BUSINESS_ACCOUNT_NAME,
+        'account_number': settings.BUSINESS_ACCOUNT_NUMBER,
+        'branch_code': settings.BUSINESS_BRANCH_CODE,
+        # 'account_type': settings.BUSINESS_ACCOUNT_TYPE,
+        # 'swift_code': settings.BUSINESS_SWIFT_CODE,
+        # 'reference': settings.BUSINESS_REFERENCE,
     })
 
 
@@ -358,3 +376,78 @@ def safety_guidelines(request):
         'content': content,
         'title': content.title
     })
+
+
+
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import os
+from .services.email_service import EmailSubmissionService
+from .forms import PDFSubmissionForm
+
+@login_required
+def pdf_submission(request):
+    """
+    Handle PDF submissions via email with history tracking
+    """
+    if request.method == 'POST':
+        form = PDFSubmissionForm(request.POST, request.FILES)
+        if form.is_valid():
+            pdf_file = form.cleaned_data['pdf_file']
+            message = form.cleaned_data['message']
+            
+            try:
+                # Send email with PDF attachment
+                success = EmailSubmissionService.send_pdf_submission(
+                    user=request.user,
+                    pdf_file=pdf_file,
+                    message=message
+                )
+                
+                if success:
+                    # Log submission history
+                    SubmissionHistory.objects.create(
+                        landlord=request.user,
+                        filename=pdf_file.name,
+                        file_size=pdf_file.size,
+                        message=message or '',
+                        status='sent'
+                    )
+                    messages.success(
+                        request, 
+                        '✅ Proof of payment submitted successfully! We have received your document via email.'
+                    )
+                else:
+                    # Track failed attempts too
+                    SubmissionHistory.objects.create(
+                        landlord=request.user,
+                        filename=pdf_file.name,
+                        file_size=pdf_file.size,
+                        message=message or '',
+                        status='failed'
+                    )
+                    messages.error(
+                        request,
+                        '❌ Failed to submit document. Please try again or contact support.'
+                    )
+                    
+            except Exception as e:
+                # Track errors too
+                SubmissionHistory.objects.create(
+                    landlord=request.user,
+                    filename=pdf_file.name if pdf_file in locals() else 'unknown',
+                    file_size=pdf_file.size if 'pdf_file' in locals() else 0,
+                    message=message or '',
+                    status='failed'
+                )
+                messages.error(
+                    request,
+                    f'❌ Error submitting document: {str(e)}'
+                )
+            
+            return redirect('landlord_dashboard')
+    
+    # If GET request or form invalid, show error
+    messages.error(request, 'Please select a valid PDF file to submit.')
+    return redirect('landlord_dashboard')
+

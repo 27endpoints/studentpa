@@ -1,9 +1,11 @@
+from click import File
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from accommodations import forms
 from django import forms
 from .models import Accommodation, Location, AccommodationImage, LandlordProfile, StudentProfile, SiteContent
 from django.db import models
+from django.utils import timezone
 
 
 
@@ -140,6 +142,11 @@ class SiteContentAdmin(admin.ModelAdmin):
             '''
         }),
     )
+
+
+
+    
+    
 
 # Customize admin site
 admin.site.site_header = "StudentPA Admin"

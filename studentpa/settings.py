@@ -30,10 +30,7 @@ DEBUG=True
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = os.getenv('DEBUG') == 'True'
-ALLOWED_HOSTS = ['studentpa.onrender.com',
-                  'www.studentpa.online', 
-                  'studentpa.online',
-                  '127.0.0.1',]
+
 # reCAPTCHA KEYS
 RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
 RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
@@ -44,6 +41,29 @@ SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_COOKIE_SECURE = True    # Only if using HTTPS
 SESSION_COOKIE_HTTPONLY = True  # Always recommended
 
+
+
+def get_allowed_hosts():
+    """
+    Get ALLOWED_HOSTS from environment with fallbacks
+    """
+    env_hosts = os.getenv('ALLOWED_HOSTS', '')
+    
+    if env_hosts:
+        # Split by comma and clean up
+        hosts = [host.strip() for host in env_hosts.split(',') if host.strip()]
+    else:
+        # Default development hosts
+        hosts = ['localhost', '127.0.0.1']
+    
+    # Always allow localhost in development
+    if DEBUG:
+        hosts.extend(['localhost', '127.0.0.1'])
+    
+    # Remove duplicates
+    return list(set(hosts))
+
+ALLOWED_HOSTS = get_allowed_hosts()
 
 # Application definition
 
@@ -59,6 +79,7 @@ INSTALLED_APPS = [
     'accommodations',
     'django_recaptcha',
     'seo',
+    
 
 ]
 SITE_ID = 1
@@ -93,12 +114,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'studentpa.wsgi.application'
 
-
-# recaptcha config
-# reCAPTCHA settings for django-recaptcha 4.x
-# RECAPTCHA_PUBLIC_KEY = '6LeHC-0rAAAAAG0Gr53zNNUazx8onIMSbVG9UxXA'  # Test public key
-# RECAPTCHA_PRIVATE_KEY = '6LeHC-0rAAAAAO0vW55qfhrajubt2sc4miDH0oQi'  # Test private key
-#  RECAPTCHA_PUBILC_KEY = ()
 
 
 
@@ -165,6 +180,27 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', EMAIL_HOST_USER)
+
+# Business Banking Details from Environment Variables
+BUSINESS_BANK_NAME = os.getenv('BUSINESS_BANK_NAME')
+BUSINESS_ACCOUNT_NAME = os.getenv('BUSINESS_ACCOUNT_NAME')
+BUSINESS_ACCOUNT_NUMBER = os.getenv('BUSINESS_ACCOUNT_NUMBER')
+BUSINESS_BRANCH_CODE = os.getenv('BUSINESS_BRANCH_CODE')
+# BUSINESS_ACCOUNT_TYPE = os.getenv('BUSINESS_ACCOUNT_TYPE', 'Business Current Account')
+# BUSINESS_SWIFT_CODE = os.getenv('BUSINESS_SWIFT_CODE', 'ABSAZAJJ')
+# BUSINESS_REFERENCE = os.getenv('BUSINESS_REFERENCE', 'Your Full Name or Company Name')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

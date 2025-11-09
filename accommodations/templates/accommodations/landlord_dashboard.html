@@ -146,16 +146,175 @@
         </div>
         {% endif %}
     </div>
-
-    <!-- Important Information Box -->
-    <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 class="text-lg font-semibold text-blue-800 mb-2">Dashboard Overview</h3>
-        <ul class="text-blue-700 list-disc list-inside space-y-1">
-            <li><strong>Total Listings:</strong> Count of all your accommodation listings</li>
-            <li><strong>Approved:</strong> Listings that are visible to students</li>
-            <li><strong>Pending:</strong> Listings waiting for admin approval</li>
-            <li><strong>Available Rooms:</strong> Total number of rooms available for booking across all approved listings</li>
-        </ul>
+    <!-- Banking Details Section -->
+<div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 bg-green-50">
+        <h2 class="text-xl font-semibold text-green-800">💰 Payment Information</h2>
+    </div>
+    
+    <div class="p-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <p class="text-green-700 text-sm">
+                <strong>Please use this banking information for all payments.</strong> 
+               Please reference using your studentPA username
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Bank Details -->
+            <div class="space-y-3">
+                <h3 class="text-lg font-semibold text-gray-800 border-b pb-2">Banking Details</h3>
+                
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="font-medium text-gray-600">Bank:</span>
+                    <span class="text-gray-900">{{ bank_name }}</span>
+                </div>
+                
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="font-medium text-gray-600">Account Name:</span>
+                    <span class="text-gray-900">{{ account_name }}</span>
+                </div>
+                
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="font-medium text-gray-600">Account Number:</span>
+                    <span class="text-gray-900 font-mono">{{ account_number }}</span>
+                </div>
+                
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="font-medium text-gray-600">Branch Code:</span>
+                    <span class="text-gray-900">{{ branch_code }}</span>
+                </div>
+                
+               
+            </div>
+            
+            <!-- International & Reference -->
+            
+        </div>
+        
+        <!-- Important Notes -->
+        <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h4 class="font-semibold text-yellow-800 mb-2">📋 Important Payment Instructions</h4>
+            <ul class="text-yellow-700 text-sm list-disc list-inside space-y-1">
+                <li>Always use the correct reference when making payments</li>
+                <li>Email your proof of payment using the form below after payment</li>
+                <li>Payments may take 24-48 hours to reflect</li>
+                <li>Contact support if you don't receive payment confirmation within 2 business days info@studentpa.online</li>
+            </ul>
+        </div>
     </div>
 </div>
+    <!-- pdf section -->
+<div class="mt-8 bg-white rounded-lg shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-xl font-semibold">Submit Proof of Payment</h2>
+    </div>
+    
+    <div class="p-6">
+        <!-- Simple Submission Form -->
+        <form method="post" action="{% url 'pdf_submission' %}" enctype="multipart/form-data" class="space-y-4">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    📄 Upload Proof of Payment (PDF only)
+                </label>
+                <input type="file" name="pdf_file" accept=".pdf" 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md" required>
+                <p class="text-sm text-gray-500 mt-1">Maximum file size: 10MB • PDF format only</p>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    📝 Contact information and any additional notes (Optional)
+                </label>
+                <textarea name="message" rows="3" 
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                          placeholder="Please leave us your contact information..." required></textarea>
+            </div>
+            
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 class="text-sm font-semibold text-blue-800 mb-2">How it works:</h3>
+                <ul class="text-blue-700 text-sm list-disc list-inside space-y-1">
+                    <li>Upload your proof of payment as a PDF file</li>
+                    <li>Click "Submit to Admin" to send it directly to our team</li>
+                    <li>We'll review your document and contact you if needed</li>
+                    <li>No files are stored on our server - sent directly via email</li>
+                </ul>
+            </div>
+            
+            <button type="submit" 
+                    class="w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold text-lg">
+                📧 Submit to Admin
+            </button>
+        </form>
+
+        
+        <!-- Submission History -->
+<div class="mt-8 pt-6 border-t border-gray-200">
+    <h3 class="text-lg font-semibold mb-4">Recent Submissions</h3>
+    
+    {% if recent_submissions %}
+    <div class="space-y-3">
+        {% for submission in recent_submissions %}
+        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                        {% if submission.status == 'sent' %}
+                        <span class="text-green-600">✅</span>
+                        <span class="font-medium text-gray-900">{{ submission.filename }}</span>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                            Sent Successfully
+                        </span>
+                        {% else %}
+                        <span class="text-red-600">❌</span>
+                        <span class="font-medium text-gray-900">{{ submission.filename }}</span>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                            Failed
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="text-sm text-gray-600 space-y-1">
+                        <div>
+                            <span class="font-medium">Size:</span> {{ submission.file_size_display }}
+                        </div>
+                        <div>
+                            <span class="font-medium">Date:</span> {{ submission.submitted_at|date:"M d, Y at H:i" }}
+                        </div>
+                        {% if submission.message %}
+                        <div class="mt-1">
+                            <span class="font-medium">Note:</span> 
+                            <span class="text-gray-700">{{ submission.message }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+
+    {% else %}
+    <div class="bg-gray-50 rounded-lg p-6 text-center">
+        <div class="text-gray-500 mb-2">No submission history yet</div>
+        <p class="text-gray-600 text-sm">Your PDF submission history will appear here.</p>
+    </div>
+    {% endif %}
+    
+    <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <p class="text-sm text-blue-700">
+            <strong>Note:</strong> Your submission history is saved across all browsers and devices. 
+            All documents are sent directly to our admin team via email - no files are stored on our servers.
+        </p>
+    </div>
+</div>
+    </div>
+</div>
+
+
+</div>
+
 {% endblock %}

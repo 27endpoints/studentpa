@@ -55,6 +55,7 @@ urlpatterns = [
     path('dashboard/accommodation/<int:pk>/preview/', views.accommodation_preview, name='accommodation_preview'),
 
 
+    path('dashboard/submit-pdf/', views.pdf_submission, name='pdf_submission'),
      # Content pages
     path('terms/', views.terms_and_conditions, name='terms_and_conditions'),
     path('privacy/', views.privacy_policy, name='privacy_policy'),

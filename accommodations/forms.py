@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Accommodation, AccommodationImage, StudentProfile, LandlordProfile, Location
 from django_recaptcha.fields import ReCaptchaField
+from django.core.validators import FileExtensionValidator
 
 class RoleSelectionForm(forms.Form):
     ROLE_CHOICES = [
@@ -17,7 +18,7 @@ class RoleSelectionForm(forms.Form):
 
 
 class CustomUserCreationForm(UserCreationForm):
-    captcha = ReCaptchaField()
+    # captcha = ReCaptchaField()
     email = forms.EmailField(required=False)   #for future use
     last_name = forms.CharField(max_length=30, required=False)
 
@@ -97,3 +98,36 @@ class AccommodationWithImagesForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['location'].queryset = Location.objects.all()
+
+
+class PDFSubmissionForm(forms.Form):
+    pdf_file = forms.FileField(
+        label='Upload Proof of Payment',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf'])],
+        widget=forms.FileInput(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md',
+            'accept': '.pdf'
+        })
+    )
+    message = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'w-full px-3 py-2 border border-gray-300 rounded-md',
+            'rows': 3,
+            'placeholder': 'Optional message or notes...'
+        })
+    )
+    
+    def clean_pdf_file(self):
+        pdf_file = self.cleaned_data.get('pdf_file')
+        if pdf_file:
+            # Check file size (10MB limit)
+            if pdf_file.size > 10 * 1024 * 1024:
+                raise forms.ValidationError("File size must be under 10MB")
+            
+            # Basic PDF validation
+            if not pdf_file.name.lower().endswith('.pdf'):
+                raise forms.ValidationError("Only PDF files are allowed")
+                
+        return pdf_file
+

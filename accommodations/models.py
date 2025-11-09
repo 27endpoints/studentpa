@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import os
+import magic
+from django.db import models
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 class SiteContent(models.Model):
@@ -119,3 +124,29 @@ def save_user_profile(sender, instance, **kwargs):
         instance.studentprofile.save()
     if hasattr(instance, 'landlordprofile'):
         instance.landlordprofile.save()
+
+# submission history model
+class SubmissionHistory(models.Model):
+    landlord = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pdf_submissions')
+    filename = models.CharField(max_length=255)
+    file_size = models.IntegerField(help_text="Size in bytes")
+    message = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20, 
+        choices=[('sent', 'Sent'), ('failed', 'Failed')],
+        default='sent'
+    )
+    
+    class Meta:
+        ordering = ['-submitted_at']
+        verbose_name_plural = "Submission Histories"
+    
+    def __str__(self):
+        return f"{self.landlord.username} - {self.filename}"
+    
+    def file_size_display(self):
+        """Human readable file size"""
+        if self.file_size < 1024 * 1024:  # Less than 1MB
+            return f"{self.file_size / 1024:.1f} KB"
+        return f"{self.file_size / (1024 * 1024):.1f} MB"
