@@ -18,7 +18,7 @@ class RoleSelectionForm(forms.Form):
 
 
 class CustomUserCreationForm(UserCreationForm):
-    # captcha = ReCaptchaField()
+    captcha = ReCaptchaField()
     email = forms.EmailField(required=False)   #for future use
     last_name = forms.CharField(max_length=30, required=False)
 
